@@ -1,9 +1,3 @@
-public class Hello {
-    public static void main(String[] args) {
-        System.out.println("おはようございます、Java");
-    }
-}
-
 // Itemsという名前のクラス（プログラムをまとめる箱）を作ります。
 public class Items {
 
@@ -11,13 +5,18 @@ public class Items {
     public static void main(String[] args) {
 
         // String型の配列（複数の文字列を順番に入れる箱）todosを作ります。
-        String[] todos = { "牛乳を買う", "卵を買う", "パンを買う" };
+        String[] todos = { "牛乳を買う", "", "パンを買う", "掃除をする" };
 
         // iを0から始め、配列の件数より小さい間、繰り返します。
-        for (int i = 0; i < todos.length; i++) {
+        boolean[] done = { true, false, false, false };
+
+        for (int i = 1; i <= todos.length; i++) {
 
             // todosからi番目の文字列を取り出し、liタグで囲んで出力します。
-            System.out.println("<li>" + todos[i] + "</li>");
+            if (!todos[i].isEmpty()) {
+                String mark = done[i] ? "[済] " : "";
+                System.out.println("<li>" + mark + todos[i] + "</li>");
+            }
         }
     }
 }
