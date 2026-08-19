@@ -95,18 +95,30 @@ public class App {
         html.append("<!doctype html><html lang='ja'><meta charset='UTF-8'>");
         html.append("<title>ToDoリスト</title>");
         html.append("<style>");
-        html.append("*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(135deg,#eef2ff,#f8fafc);font-family:Arial,'Noto Sans JP',sans-serif;color:#1e293b;padding:40px 16px}");
-        html.append(".container{max-width:640px;margin:auto;background:#fff;border-radius:20px;padding:32px;box-shadow:0 18px 45px rgba(30,41,59,.12)}");
-        html.append("h1{margin:0 0 24px;font-size:30px;color:#312e81}.add-form{display:flex;gap:10px;margin-bottom:26px}");
-        html.append(".add-form input{flex:1;border:1px solid #cbd5e1;border-radius:10px;padding:12px 14px;font-size:16px;outline:none}.add-form input:focus{border-color:#6366f1;box-shadow:0 0 0 3px #e0e7ff}");
-        html.append("button{border:0;border-radius:10px;background:#4f46e5;color:#fff;padding:0 20px;font-size:15px;font-weight:bold;cursor:pointer}button:hover{background:#4338ca}");
-        html.append(".todo-list{padding:0;margin:0;list-style:none}.todo-item{display:flex;align-items:center;gap:12px;padding:15px 16px;margin:10px 0;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc}.todo-item form{display:flex;align-items:center;gap:12px;flex:1}.todo-item input[type=checkbox]{width:19px;height:19px;accent-color:#4f46e5;cursor:pointer}.todo-item a{color:#ef4444;text-decoration:none;font-size:13px}.todo-item a:hover{text-decoration:underline}.done{text-decoration:line-through;color:#94a3b8}");
+        html.append(
+                "*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(135deg,#eef2ff,#f8fafc);font-family:Arial,'Noto Sans JP',sans-serif;color:#1e293b;padding:40px 16px}");
+        html.append(
+                ".container{max-width:640px;margin:auto;background:#fff;border-radius:20px;padding:32px;box-shadow:0 18px 45px rgba(30,41,59,.12)}");
+        html.append(
+                ".header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}h1{margin:0;font-size:30px;color:#312e81}.progress{color:#64748b;font-size:14px;text-align:right;white-space:nowrap}.add-form{display:flex;gap:10px;margin-bottom:26px}");
+        html.append(
+                ".add-form input{flex:1;border:1px solid #cbd5e1;border-radius:10px;padding:12px 14px;font-size:16px;outline:none}.add-form input:focus{border-color:#6366f1;box-shadow:0 0 0 3px #e0e7ff}");
+        html.append(
+                "button{border:0;border-radius:10px;background:#4f46e5;color:#fff;padding:0 20px;font-size:15px;font-weight:bold;cursor:pointer}button:hover{background:#4338ca}");
+        html.append(
+                ".todo-list{padding:0;margin:0;list-style:none}.todo-item{display:flex;align-items:center;gap:12px;padding:15px 16px;margin:10px 0;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc}.todo-item form{display:flex;align-items:center;gap:12px;flex:1}.todo-item input[type=checkbox]{width:19px;height:19px;accent-color:#4f46e5;cursor:pointer}.todo-item a{color:#ef4444;text-decoration:none;font-size:13px}.todo-item a:hover{text-decoration:underline}.done{text-decoration:line-through;color:#94a3b8}.empty-message{text-align:center;color:#64748b;padding:30px 0}");
         html.append("</style><main class='container'>");
-        html.append("<h1>ToDoリスト</h1>");
+        long completedCount = todos.stream().filter(Todo::isDone).count();
+        html.append("<div class='header'><h1>ToDoリスト</h1>");
+        html.append("<div class='progress'>全").append(todos.size()).append("件中 ");
+        html.append(completedCount).append("件完了</div></div>");
         html.append("<form class='add-form' method='post' action='/add'>");
         html.append("<input name='todo' placeholder='やることを入力' required>");
         html.append("<button type='submit'>追加</button></form><ul class='todo-list'>");
 
+        if (todos.isEmpty()) {
+            html.append("<p class='empty-message'>今やることはありません</p>");
+        }
         for (Todo todo : todos) {
             html.append("<li class='todo-item ").append(todo.isDone() ? "done" : "").append("'>");
             html.append("<form method='post' action='/toggle' style='display:inline'>");
