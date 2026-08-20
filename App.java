@@ -107,7 +107,8 @@ public class App {
     private static String renderTodoList() {
         long completed = todos.stream().filter(Todo::isDone).count();
         StringBuilder html = new StringBuilder();
-        html.append("<!doctype html><html lang='ja'><head><meta charset='UTF-8'>");
+        html.append(
+                "<!doctype html><html lang='ja'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1'>");
         html.append("<title>ToDo\u30ea\u30b9\u30c8</title><style>");
         html.append(
                 "*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(135deg,#eef2ff,#f8fafc);font-family:Arial,'Noto Sans JP',sans-serif;color:#1e293b;padding:40px 16px}");
@@ -121,6 +122,10 @@ public class App {
                 "button{border:0;border-radius:10px;background:#4f46e5;color:#fff;padding:0 20px;font-size:15px;font-weight:bold;cursor:pointer}button:hover{background:#4338ca}");
         html.append(
                 ".todo-list{padding:0;margin:0;list-style:none}.todo-item{display:flex;align-items:center;gap:12px;padding:15px 16px;margin:10px 0;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc}.todo-item form{display:flex;align-items:center;gap:12px;flex:1}.todo-item input[type=checkbox]{width:19px;height:19px;accent-color:#4f46e5;cursor:pointer}.todo-item a{color:#ef4444;text-decoration:none;font-size:13px}.todo-item a:hover{text-decoration:underline}.done{text-decoration:line-through;color:#94a3b8}.empty-message{text-align:center;color:#64748b;padding:30px 0}");
+        html.append(
+                ".todo-item form{min-width:0}.todo-item form input[type=checkbox]{flex:0 0 auto}.todo-item form{overflow-wrap:anywhere}.todo-item a{flex:0 0 auto}.empty-message{text-align:center;color:#64748b;padding:30px 0}");
+        html.append(
+                "@media (max-width:600px){body{padding:16px 10px}.container{padding:22px 16px;border-radius:16px}.header{align-items:flex-start;gap:8px;margin-bottom:20px}h1{font-size:25px}.progress{font-size:12px;padding-top:5px}.add-form{gap:8px;margin-bottom:20px}.add-form input{min-width:0;padding:11px 12px}.add-form button{padding:0 14px}.todo-item{align-items:flex-start;gap:9px;padding:12px}.todo-item form{align-items:flex-start;gap:9px;line-height:1.5}.todo-item input[type=checkbox]{margin-top:3px}.todo-item a{font-size:12px;padding-top:3px}}");
         html.append("</style></head><body><main class='container'>");
         html.append("<div class='header'><h1>ToDo\u30ea\u30b9\u30c8</h1><div class='progress'>\u5168")
                 .append(todos.size()).append("\u4ef6\u4e2d ").append(completed)
@@ -140,10 +145,19 @@ public class App {
                     "<input type='hidden' name='done' value='false'><input type='checkbox' name='done' value='true'");
             if (todo.isDone())
                 html.append(" checked");
-            html.append(" onchange='this.form.submit()'> ").append(escapeHtml(todo.getTitle()));
+            html.append(" onchange='this.form.requestSubmit()'> ").append(escapeHtml(todo.getTitle()));
             html.append("</form><a href='/delete?id=").append(todo.getId()).append("'>\u524a\u9664</a></li>");
         }
-        html.append("</ul></main></body></html>");
+        html.append("</ul></main><script>");
+        html.append("const list=document.querySelector('.todo-list');");
+        html.append("const progress=document.querySelector('.progress');");
+        html.append(
+                "function updateProgress(){const items=document.querySelectorAll('.todo-item');const completed=[...items].filter(item=>item.querySelector('input[type=checkbox]').checked).length;progress.textContent='全'+items.length+'件中 '+completed+'件完了';if(!items.length&&!list.querySelector('.empty-message')){list.innerHTML='<p class=\\'empty-message\\'>今やることはありません</p>';}} ");
+        html.append(
+                "document.querySelectorAll('.todo-item form').forEach(form=>form.addEventListener('submit',async event=>{event.preventDefault();const item=form.closest('.todo-item');const checkbox=form.querySelector('input[type=checkbox]');const done=checkbox.checked;const body=new URLSearchParams(new FormData(form));try{const response=await fetch(form.action,{method:'POST',body});if(!response.ok)throw new Error();item.classList.toggle('done',done);updateProgress();}catch(error){checkbox.checked=!done;alert('更新に失敗しました。');}}));");
+        html.append(
+                "document.querySelectorAll('.todo-item a').forEach(link=>link.addEventListener('click',async event=>{event.preventDefault();const item=link.closest('.todo-item');try{const response=await fetch(link.href);if(!response.ok)throw new Error();item.remove();updateProgress();}catch(error){alert('削除に失敗しました。');}}));");
+        html.append("</script></body></html>");
         return html.toString();
     }
 
